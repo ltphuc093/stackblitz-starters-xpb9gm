@@ -1,22 +1,21 @@
-const express = require('express');
-const { createServer } = require('node:http');
+const express = require("express");
 const { join } = require('node:path');
-const { Server } = require('socket.io');
-
+const { WebSocketServer } = require('ws');
 const app = express();
-const server = createServer(app);
-const io = new Server(server);
+const wss = new WebSocketServer({ port: 7071  });
+const port = process.env.PORT || 8080;
+wss.on('connection', function connection(ws) {
+  ws.on('message', function message(data) {
+    console.log('received: %s', data);
+  });
+
+  ws.send('something');
+});
 
 app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'index.html'));
-});
-
-io.on('connection', (socket) => {
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
+    res.sendFile(join(__dirname, 'index.html'));
   });
-});
 
-server.listen(3000, () => {
-  console.log('server running at http://localhost:3000');
-});
+app.listen(port, () => {
+    console.log(`App listening on port ${port}!`);
+  });
