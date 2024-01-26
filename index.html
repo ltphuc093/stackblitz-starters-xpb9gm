@@ -9,7 +9,7 @@
   </form>
   <div id="messages"></div>
   <script>
-    const webSocket = new WebSocket('ws://ltp_corecm-1-t5451924.deta.app:7071/');
+    const webSocket = new WebSocket('ws://chitchat-ltpocket.koyeb.app:443/');
     webSocket.onmessage = (event) => {
       console.log(event)
       document.getElementById('messages').innerHTML += 
