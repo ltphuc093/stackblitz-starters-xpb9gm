@@ -20,7 +20,10 @@ io.on('connection', (socket) => {
   })
 
   socket.on('messageFL', (msg) => {
-    io.emit('message', msg)
+    var message = msg["message"];
+    var chatroomID = msg["chatroomID"];
+    io.emit('message', msg);
+    io.emit('ChatRoom_ID'+chatroomID, msg);
   })
 })
 
