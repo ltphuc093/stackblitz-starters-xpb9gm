@@ -2,7 +2,8 @@ const express = require("express")
 const app = express()
 const http = require("http").Server(app)
 const io = require("socket.io")(http)
-
+const sqlite3 = require('sqlite3').verbose();
+const m_common = require("./common.js");
 const port = process.env.PORT || 8000
 
 app.get("/", function (req, res) {
@@ -28,5 +29,13 @@ io.on('connection', (socket) => {
 
 
 http.listen(port, () => {
+  //init database
+  let db = new sqlite3.Database(m_common.path_database, (err) => {
+    if (err) {
+      console.error(err.message);
+    }
+    console.log('Connected to the chinook database.');
+  });
+
   console.log(`App listening on port ${port}`)
 });
