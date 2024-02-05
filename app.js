@@ -5,6 +5,8 @@ const io = require("socket.io")(http)
 const sqlite3 = require('sqlite3').verbose();
 const m_common = require("./common.js");
 const port = process.env.PORT || 8000
+const fs = require("fs")
+
 
 app.get("/", function (req, res) {
   res.sendFile(__dirname + "/index.html")
@@ -29,13 +31,38 @@ io.on('connection', (socket) => {
 
 
 http.listen(port, () => {
-  //init database
-  let db = new sqlite3.Database(m_common.path_database, (err) => {
+  //checkfile database
+  fs.lstat(m_common.path_database, (err, stats) => {
     if (err) {
-      console.error(err.message);
+      console.error(err);
+      fs.mkdir(m_common.path_db_directory,
+        (err) => {
+            if (err) {
+                return console.error(err);
+            }
+            console.log('Directory created successfully!');
+        });
+
+        fs.writeFile(m_common.path_database, '', function (err) {
+          if (err) throw err;
+          console.log('File is created successfully.');
+        });
+      initDatabase();
     }
-    console.log('Connected to the chinook database.');
+    else {
+      initDatabase();
+    }
   });
 
-  console.log(`App listening on port ${port}`)
+  function initDatabase(){
+    //init database
+    const db=new sqlite3.Database(m_common.path_database, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+      if (err) {
+
+        console.error(err.message);
+      }
+      console.log('Connected to the chinook database.');
+    });
+    console.log(`App listening on port ${port}`)
+  }
 });
