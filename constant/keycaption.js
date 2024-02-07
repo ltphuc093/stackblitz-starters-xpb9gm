@@ -7,7 +7,7 @@ const q_sqlite_tb_chatroom_message =
 const q_sqlite_tb_chatsystem =
     'CREATE TABLE chatsystem (accountID TEXT PRIMARY KEY, countContact TEXT, countContact_Date INTEGER)';
 var path_db_directory = "./db";
-const name_dbsqlite = "db_local_ltpacha.db";
+const name_dbsqlite = "db_local_ltpacha";
 var path_database = path_db_directory + "/" + name_dbsqlite;
 
 
@@ -16,7 +16,7 @@ module.exports = {
     q_sqlite_tb_contact: q_sqlite_tb_contact,
     q_sqlite_tb_chatroom_message: q_sqlite_tb_chatroom_message,
     q_sqlite_tb_chatsystem: q_sqlite_tb_chatsystem,
-    name_dbsqlite: q_sqlite_tb_chatsystem,
+    name_dbsqlite: name_dbsqlite,
     path_db_directory : path_db_directory,
     path_database : path_database,
 };
