@@ -11,6 +11,31 @@ const m_keycaption = require("./constant/keycaption.js");
 app.get("/", function (req, res) {
   res.sendFile(__dirname + "/index.html")
 })
+.get("/GetListContactAccountID", function (req, res) {
+  var query  = req.query;
+  var mAccountID = query.accountID;
+  var listResult = {};
+
+  let db = new sqlite3.Database(m_keycaption.path_database);
+  db.serialize(() => {
+    //Get current row number
+    let sql = `SELECT *
+            FROM chatroom
+            WHERE accountIDs  LIKE %?%`;
+
+    db.all(sql, [mAccountID], (err, rows) => {
+      if (err) {
+      }
+      rows.forEach((row) => {
+        listResult.push(row);
+      });
+    });
+  });
+
+  db.close();
+  return listResult;
+})
+
 .get("/GetListChatRoomByAccountID", function (req, res) {
   var query  = req.query;
   var mAccountID = query.accountID;
