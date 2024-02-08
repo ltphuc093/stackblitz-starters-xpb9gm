@@ -11,6 +11,32 @@ const m_keycaption = require("./constant/keycaption.js");
 app.get("/", function (req, res) {
   res.sendFile(__dirname + "/index.html")
 })
+.get("/GetListChatRoomByAccountID", function (req, res) {
+  var query  = req.query;
+  var mAccountID = query.accountID;
+  var listResult = {};
+
+  let db = new sqlite3.Database(m_keycaption.path_database);
+  db.serialize(() => {
+    //Get current row number
+    let sql = `SELECT *
+            FROM chatroom
+            WHERE accountIDs  LIKE %?%`;
+
+    db.all(sql, [mAccountID], (err, rows) => {
+      if (err) {
+      }
+      rows.forEach((row) => {
+        listResult.push(row);
+      });
+    });
+  });
+
+  db.close();
+  return listResult;
+})
+
+
 
 io.on('connection', (socket) => {
   console.log('Client connected')
@@ -30,7 +56,7 @@ io.on('connection', (socket) => {
 
   socket.on('send_message', (msg) => {
     var mCurrentDate = new Date();
-    var mID = msg["id"];
+    var mID = mFromAccountID + "_" + mCurrentDate.YYYYMMDDHHMMSS();
     var mFromAccountID = msg["fromAccountID"];
     var mToAccountID = msg["toAccountID"];
     var mMessage = msg["message"];
@@ -40,7 +66,6 @@ io.on('connection', (socket) => {
     var mLastDate = mCurrentDate.YYYYMMDDHHMMSS();
     var mChatroomID = msg["chatroomID"];
     let db = new sqlite3.Database(m_keycaption.path_database);
-
     db.serialize(() => {
       //Get current row number
       let sql = `SELECT MAX(row_number) CurrentRowNumber
@@ -67,11 +92,23 @@ io.on('connection', (socket) => {
     });
 
     db.close();
+
+    msg["id"] = mID;
     io.emit(toAccountID + "_received_message", msg);
   })
 
   socket.on('confirm_receive_message', (msg) => {
-    var toAccountID = msg["toAccountID"];
+    var mID = msg["id"];
+    var mStatus = 1;
+    if(mID != null && mID != undefined && mID != ""){
+      var  sql = `UPDATE chatroom_message 
+      SET status = '` + mStatus + ` `
+     + `WHERE id = '` + mID + ``;
+
+     db.run(sql, function (err) {
+      // 
+    });
+    }
   })
 })
 
